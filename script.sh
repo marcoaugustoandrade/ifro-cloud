@@ -5,8 +5,12 @@ read -p 'Informe o nome-sobrenome do aluno: ' USUARIO
 # Criando o container
 sudo lxc launch ubuntu:18.04 $USUARIO
 
-# Acessando o container
-sudo lxc exec $USUARIO -- bash
+  # Acessando o container
+  #sudo lxc exec $USUARIO -- bash
+
+# Executando script no container
+sudo lxc-attach
+ wget script-container.sh && ./script-container <<
 
 # Criando o usuário
 echo -e "Suporte99\nSuporte99" | adduser $USUARIO
