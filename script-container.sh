@@ -1,5 +1,5 @@
 # Criando o usuário
-echo -e "Suporte99\nSuporte99" | adduser $USUARIO
+echo -e "Suporte99\nSuporte99" | adduser suporte
 usermod -s /bin/bash suporte
 
 # Colocando o usuário no grupo sudors
@@ -16,12 +16,15 @@ snap install node --channel=10/stable --classic
 # Instalando o LocalTunnel
 npm install -g localtunnel
 
-# Colocando o LocalTunnel na inicialização
+# Colocando o LocalTunnel na inicialização (ainda tem erros
 touch /etc/rc.local
-echo "lt --port 3000 --subdomain $USUARIO" >> /etc/rc.local
-echo "lt --port 22 --subdomain $USUARIO-ssh" >> /etc/rc.local
+echo "lt --port 3000 --subdomain $1" >> /etc/rc.local
+echo "lt --port 22 --subdomain $1-ssh" >> /etc/rc.local
 chmod +x /etc/rc.local
 
 # Atualizando os pacotes do container
 apt update
 apt upgrade -y
+
+# Reiniciando o container
+#reboot
