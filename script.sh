@@ -1,9 +1,16 @@
-# Criando usuário
-useradd suporte
-usermod -s /bin/bash suporte
+# Definindo o nome do aluno
+read -p 'Informe o nome-sobrenome do aluno: ' USUARIO
+# USUARIO="marco-andrade"
 
-# Definindo a senha padrão
-echo -e "Suporte99\nSuporte99" | passwd suporte
+# Criando o container
+sudo lxc launch ubuntu:18.04 $USUARIO
+
+# Acessando o container
+sudo lxc exec $USUARIO -- bash
+
+# Criando o usuário
+echo -e "Suporte99\nSuporte99" | adduser $USUARIO
+usermod -s /bin/bash suporte
 
 # Colocando o usuário no grupo sudors
 usermod -aG sudo suporte
@@ -13,33 +20,20 @@ sed -i 's/#Port 22/Port 22/g' /etc/ssh/sshd_config
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 systemctl restart sshd
 
-# Baixando o ngrok
-wget https://github.com/marcoaugustoandrade/ifro-cloud/blob/master/ngrok?raw=true
+# Instalando o nodejs
+snap install node --channel=10/stable --classic
 
-# Redirecionando o SSH (to 20)
-./ngrok http 22 subdomain
+# Instalando o LocalTunnel
+npm install -g localtunnel
 
-# Redirecionando o Web Server (to 3000)
-./ngrok http 3000
-
-# Solicitando troca de senha no próximo login
-chage -d 0 suporte
+# Colocando o LocalTunnel na inicialização
+touch /etc/rc.local
+echo "lt --port 3000 --subdomain $USUARIO" >> /etc/rc.local
+echo "lt --port 22 --subdomain $USUARIO-ssh" >> /etc/rc.local
+chmod +x /etc/rc.local
 
 # Atualizando os pacotes do container
 apt update
 apt upgrade -y
-
-# Enviando email
-apt install mutt
-
-Título: Acesso ao IFRO-VLH Cloud
-Corpo:
-Para acessar seu container via SSH utilize:
-ssh suporte@nome-sobrenome.ssh@adsvilhena.app -P
-
-A senha padrão é Suporte99, mas será solicitado a troca da senha no primeiro acesso.
-
-Para acessar o webserver utilize:
-http://nome-sobrenome.adsvilhena.app
 
 
