@@ -27,13 +27,25 @@ sudo lxc exec $USUARIO -- snap install node --channel=10/stable --classic
 # Instalando o LocalTunnel
 sudo lxc exec $USUARIO -- npm install -g localtunnel
 
-# Colocando o LocalTunnel na inicialização
-touch rc.local
-echo "nohup lt --port 3000 --subdomain $USUARIO 2>&1 &" >> rc.local
-echo "nohup lt --port 22 --subdomain $USUARIO-ssh 2>&1 &" >> rc.local
-sudo lxc file push rc.local $USUARIO/etc/
-sudo lxc exec $USUARIO -- chmod +x /etc/rc.local
-rm rc.local
+# Colocando o LocalTunnel no crontab
+touch run.sh
+echo "nohup lt --port 3000 --subdomain $USUARIO &" >> run.sh
+echo "nohup lt --port 22 --subdomain $USUARIO-ssh &" >> run.sh
+sudo lxc file push run.sh $USUARIO/home/suporte/run.sh
+sudo lxc exec $USUARIO -- chmod +x /home/suporte/run.sh
+rm run.sh
+
+touch crontab.localtunnel
+echo "@reboot root /home/suporte/run.sh" >> crontab.localtunnel
+sudo lxc file push crontab.localtunnel $USUARIO/home/suporte/crontab.localtunnel
+sudo lxc exec $USUARIO -- crontab /home/suporte/crontab.localtunnel
+sudo lxc exec $USUARIO -- rm /home/suporte/crontab.localtunnel
+
+parei aqui
+/etc/crontab
+#sudo lxc exec $USUARIO -- crontab -l > crontab.localtunnel
+rm crontab.localtunnel
+
 
 # Atualizando os pacotes do container
 sudo lxc exec $USUARIO -- apt update
